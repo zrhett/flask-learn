@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, session, redirect, url_for, flash
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_wtf import FlaskForm
@@ -13,12 +13,14 @@ moment = Moment(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-	name = None
 	form = NameForm()
 	if form.validate_on_submit():
-		name = form.name.data
-		form.name.data = ''
-	return render_template('index.html', current_time=datetime.utcnow(), form=form, name=name)
+		old_name = session.get('name')
+		if old_name is not None and old_name != form.name.data:
+			flash('你好像改了名字！')
+		session['name'] = form.name.data
+		return redirect(url_for('index'))
+	return render_template('index.html', current_time=datetime.utcnow(), form=form, name=session.get('name'))
 
 
 @app.route('/user/<name>')
@@ -35,7 +37,7 @@ def internal_server_error(e):
 
 class NameForm(FlaskForm):
 	name = StringField('你叫什么名字？', validators=[DataRequired()])
-	submit = SubmitField('Submit')
+	submit = SubmitField('提交')
 
 if __name__ == '__main__':
 	app.run(debug=True)
