@@ -10,9 +10,14 @@
 
 {% block page_content %}
 <div class="page-header">
-    <h1>你好，{% if name %}{{ name }}{% else %}陌生人{% endif %}!</h1>
     <p>现在是：{{ moment(current_time).format('LLL') }}</p>
     <p>刷新于：{{ moment(current_time).fromNow(refresh=True) }}</p>
+    <h1>你好，{% if name %}{{ name }}{% else %}陌生人{% endif %}!</h1>
+    {% if not known %}
+    <p>见到你很高兴！</p>
+    {% else %}
+    <p>我们又见面了！</p>
+    {% endif %}
 </div>
 {{ wtf.quick_form(form) }}
 {% endblock %}
